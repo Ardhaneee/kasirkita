@@ -82,6 +82,14 @@ export async function processAndSaveProductImage(file) {
       };
     }
 
+    // Jika berjalan di lingkungan Vercel serverless tapi token belum ada pada deployment aktif:
+    if (process.env.VERCEL) {
+      return {
+        success: false,
+        error: "Blob Store baru saja dibuat tapi belum terbawa ke deployment server. Silakan lakukan Redeploy di Vercel Dashboard agar token aktif.",
+      };
+    }
+
     // Mode Fallback: Penyimpanan lokal di folder public/uploads/products/ (Development)
     const uploadDirPath = path.resolve(process.cwd(), UPLOAD_DIR_RELATIVE);
     await fs.mkdir(uploadDirPath, { recursive: true });
