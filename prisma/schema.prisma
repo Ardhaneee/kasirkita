@@ -1,0 +1,155 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id              Int             @id @default(autoincrement())
+  nama            String          @db.VarChar(100)
+  username        String          @unique @db.VarChar(50)
+  password_hash   String          @db.VarChar(255)
+  role            String          @db.VarChar(20) // 'PEMILIK' | 'KASIR'
+  status_aktif    Boolean         @default(true)
+  created_at      DateTime        @default(now())
+  updated_at      DateTime        @updatedAt
+
+  transactions    Transaction[]
+  stock_movements StockMovement[]
+
+  @@map("users")
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  nama        String    @unique @db.VarChar(50)
+  deskripsi   String?   @db.Text
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+
+  products    Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id              Int       @id @default(autoincrement())
+  category_id     Int
+  barcode         String    @unique @db.VarChar(50)
+  nama_produk     String    @db.VarChar(150)
+  harga_beli      Decimal   @db.Decimal(12, 2)
+  harga_jual      Decimal   @db.Decimal(12, 2)
+  stok            Int       @default(0)
+  stok_minimum    Int       @default(5)
+  lead_time_hari  Int?
+  safety_stock    Int?
+  satuan          String    @default("pcs") @db.VarChar(20)
+  gambar_path     String?   @db.VarChar(255)
+  status_aktif    Boolean   @default(true)
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+
+  category          Category          @relation(fields: [category_id], references: [id], onDelete: Restrict)
+  transaction_items TransactionItem[]
+  stock_movements   StockMovement[]
+
+  @@map("products")
+}
+
+model Transaction {
+  id                Int       @id @default(autoincrement())
+  invoice_number    String    @unique @db.VarChar(50)
+  idempotency_key   String    @unique @db.VarChar(100)
+  user_id           Int
+  tanggal_transaksi DateTime  @default(now())
+  total_item        Int
+  subtotal          Decimal   @db.Decimal(12, 2)
+  discount_amount   Decimal   @default(0.00) @db.Decimal(12, 2)
+  total_belanja     Decimal   @db.Decimal(12, 2)
+  nominal_bayar     Decimal   @db.Decimal(12, 2)
+  kembalian         Decimal   @db.Decimal(12, 2)
+  metode_pembayaran String    @db.VarChar(20) // 'TUNAI' | 'QRIS'
+  status_pembayaran String    @default("SELESAI") @db.VarChar(20)
+  catatan           String?   @db.Text
+  created_at        DateTime  @default(now())
+
+  user  User              @relation(fields: [user_id], references: [id], onDelete: Restrict)
+  items TransactionItem[]
+
+  @@map("transactions")
+}
+
+model TransactionItem {
+  id                   Int         @id @default(autoincrement())
+  transaction_id       Int
+  product_id           Int
+  nama_produk_snapshot String      @db.VarChar(150)
+  harga_beli_snapshot  Decimal     @db.Decimal(12, 2)
+  harga_jual_snapshot  Decimal     @db.Decimal(12, 2)
+  kuantitas            Int
+  subtotal             Decimal     @db.Decimal(12, 2)
+
+  transaction Transaction @relation(fields: [transaction_id], references: [id], onDelete: Cascade)
+  product     Product     @relation(fields: [product_id], references: [id], onDelete: Restrict)
+
+  @@map("transaction_items")
+}
+
+model StockMovement {
+  id              Int       @id @default(autoincrement())
+  product_id      Int
+  user_id         Int
+  tipe_mutasi     String    @db.VarChar(20) // 'MASUK' | 'KELUAR' | 'PENYESUAIAN' | 'PENJUALAN'
+  jumlah          Int
+  stok_awal       Int
+  stok_akhir      Int
+  referensi_nomor String?   @db.VarChar(50)
+  keterangan      String?   @db.Text
+  created_at      DateTime  @default(now())
+
+  product Product @relation(fields: [product_id], references: [id], onDelete: Restrict)
+  user    User    @relation(fields: [user_id], references: [id], onDelete: Restrict)
+
+  @@map("stock_movements")
+}
+
+model StoreSetting {
+  id                           Int      @id @default(autoincrement())
+  nama_toko                    String   @db.VarChar(100)
+  alamat                       String   @db.Text
+  no_telepon                   String   @db.VarChar(30)
+  pesan_kaki_struk             String?  @db.VarChar(255)
+  qris_image_path              String?  @db.VarChar(255)
+  default_lead_time_days       Int      @default(3)
+  default_safety_stock_percent Decimal  @default(20.00) @db.Decimal(5, 2)
+  updated_at                   DateTime @updatedAt
+
+  @@map("store_settings")
+}
+
+model SystemMetric {
+  id                  Int      @id @default(autoincrement())
+  cpu_usage_percent   Decimal  @db.Decimal(5, 2)
+  memory_rss_mb       Decimal  @db.Decimal(8, 2)
+  memory_heap_used_mb Decimal  @db.Decimal(8, 2)
+  uptime_seconds      Int
+  avg_response_time_ms Decimal @db.Decimal(8, 2)
+  recorded_at         DateTime @default(now())
+
+  @@map("system_metrics")
+}
+
+model SystemHealthLog {
+  id           Int      @id @default(autoincrement())
+  event_type   String   @db.VarChar(50)
+  status_code  Int
+  message      String   @db.Text
+  details_json String?  @db.Text
+  created_at   DateTime @default(now())
+
+  @@map("system_health_logs")
+}
