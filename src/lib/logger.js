@@ -1,5 +1,5 @@
 /**
- * Modul Pencatatan Log Sistem & Manajemen Peringatan Terstruktur (BNSP Unit 3, 5, 7).
+ * Modul Pencatatan Log Sistem & Manajemen Peringatan Terstruktur.
  *
  * Menggunakan tabel PostgreSQL `system_health_logs` yang telah tersedia di Prisma schema.
  * Dilengkapi proteksi Anti-Data Leakage (sanitasi kredensial) dan Safe Fallback saat database offline.
@@ -206,7 +206,7 @@ export async function getRecentHealthLogs(limit = 20) {
 
 /**
  * Mengambil daftar alert aktif (unresolved) dari 24 jam terakhir.
- * Termasuk peringatan resource sistem (misal RESOURCE_HIGH_MEMORY) berstatus HTTP 200 (BNSP Unit 7).
+ * Termasuk peringatan resource sistem (misal RESOURCE_HIGH_MEMORY) berstatus HTTP 200.
  * @returns {Promise<Array<object>>}
  */
 export async function getActiveAlerts() {
@@ -296,7 +296,7 @@ export async function resolveSystemAlert(logId, resolvedBy = "MANUAL_PEMILIK") {
 
 /**
  * Menyelesaikan alert aktif secara otomatis ketika kondisi metrik telah kembali normal (Self-Healing Recovery).
- * Tidak menghapus data log dari database, hanya memperbarui status resolved pada details_json (BNSP Unit 7).
+ * Tidak menghapus data log dari database, hanya memperbarui status resolved pada details_json.
  *
  * @param {string} eventType - Jenis event yang pulih (e.g. 'RESOURCE_HIGH_MEMORY', 'DATABASE_HIGH_LATENCY')
  * @param {string} [recoveryMessage="Kondisi kembali normal."] - Keterangan pemulihan

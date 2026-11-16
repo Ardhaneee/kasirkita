@@ -1,7 +1,6 @@
 /**
  * Algoritma Pecahan Uang Kembalian (Greedy Change-Making Algorithm).
  * Menghitung rincian lembar/koin uang Rupiah yang paling efisien untuk kembalian kasir.
- * Mendukung pembuktian BNSP Unit: Mengimplementasikan Algoritma Pemrograman.
  *
  * @param {number} changeAmount - Jumlah total kembalian uang (Rp)
  * @returns {Array<{ nominal: number, count: number, label: string }>} Daftar pecahan
@@ -45,7 +44,6 @@ export function calculateChangeBreakdown(changeAmount) {
 
 /**
  * Menghitung Rata-rata Penjualan Harian (Average Daily Sales / ADS).
- * Mendukung pembuktian BNSP Unit: Mengimplementasikan Algoritma Pemrograman.
  *
  * @param {number} totalQuantitySold - Total kuantitas produk terjual pada periode analisis
  * @param {number} activeDays - Jumlah hari dalam periode pengamatan (minimal 1)
@@ -59,7 +57,6 @@ export function calculateAverageDailySales(totalQuantitySold, activeDays = 30) {
 
 /**
  * Menghitung Safety Stock berdasarkan persentase buffer atau override produk.
- * Mendukung pembuktian unit kompetensi implementasi algoritma pemrograman.
  *
  * Aturan Perhitungan:
  * 1. Override Produk: Jika produk memiliki konfigurasi safety_stock khusus, gunakan nilai tersebut.

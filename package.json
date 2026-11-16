@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
     "test": "node --test --test-concurrency=1 tests/auth.test.js tests/product.test.js tests/pos.test.js tests/receipt_print.test.js tests/inventory.test.js tests/report.test.js tests/monitoring.test.js",

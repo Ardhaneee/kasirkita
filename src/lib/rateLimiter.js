@@ -1,7 +1,7 @@
 /**
  * In-memory sliding-window rate limiter untuk mitigasi serangan Brute Force Login.
  *
- * Catatan Arsitektur & Skalabilitas (BNSP Unit 5 & 16):
+ * Catatan Arsitektur & Skalabilitas:
  * Menggunakan struktur data Map in-memory native Node.js yang ringan, bebas dependency eksternal.
  * Sangat ideal untuk instalasi single-instance/lokal ritel UMKM KasirKita.
  * Untuk arsitektur multi-instance/horizontal scaling di masa depan,
@@ -123,7 +123,7 @@ export function _resetAllRateLimitsForTesting() {
 }
 
 /**
- * Resolusi IP Klien secara aman untuk mitigasi serangan Brute Force & Password Spraying (BNSP Unit 5).
+ * Resolusi IP Klien secara aman untuk mitigasi serangan Brute Force & Password Spraying.
  *
  * Kebijakan Keamanan:
  * 1. Default (TRUST_PROXY !== "true"): Header X-Forwarded-For atau X-Real-IP dari klien TIDAK DIPERCAYAI.

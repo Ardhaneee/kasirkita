@@ -964,7 +964,7 @@ export default function PosClient({
                         </span>
                       </div>
 
-                      {/* Penerapan Algoritma Greedy Pecahan Uang (Bukti BNSP) */}
+                      {/* Penerapan Algoritma Greedy Pecahan Uang */}
                       {liveChangeBreakdown.length > 0 && (
                         <div className="pt-2 border-t border-[var(--border)] space-y-1.5">
                           <div className="flex items-center justify-between text-[11px] font-semibold text-[var(--text-primary)]">

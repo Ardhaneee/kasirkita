@@ -55,7 +55,7 @@ export async function loginAction(prevState, formData) {
     };
   }
 
-  // 2. Proteksi Brute Force & Password Spraying (BNSP Unit 5: Keamanan Informasi)
+  // 2. Proteksi Brute Force & Password Spraying (Keamanan Informasi)
   // Ekstraksi IP Client secara aman tanpa mempercayai X-Forwarded-For sembarangan
   let clientIp = "127.0.0.1";
   try {

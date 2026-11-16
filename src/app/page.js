@@ -19,7 +19,7 @@ export default function HomePage() {
           </div>
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-[var(--primary-accent)] text-[var(--primary)] border border-[#d6e3d8]">
             <span className="w-1.5 h-1.5 rounded-full bg-[var(--primary)] animate-pulse" />
-            Fase 1 Fondasi Aktif
+            Sistem Aktif
           </span>
         </div>
 
@@ -71,8 +71,8 @@ export default function HomePage() {
 
         {/* Footer */}
         <div className="mt-8 pt-4 border-t border-[var(--border)] flex items-center justify-between text-xs text-[var(--text-secondary)]">
-          <span>Standar Portofolio BNSP KKNI Level 6</span>
-          <span className="font-medium text-[var(--primary)]">Siap Masuk Fase 2</span>
+          <span>Retail POS & Inventory Management System</span>
+          <span className="font-medium text-[var(--primary)]">Production Ready</span>
         </div>
       </div>
     </main>

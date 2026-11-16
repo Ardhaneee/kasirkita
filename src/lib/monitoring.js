@@ -1,5 +1,5 @@
 /**
- * Modul Pemantauan Kesehatan Sistem, Resource Runtime & PostgreSQL (BNSP Unit 2, 3, 16).
+ * Modul Pemantauan Kesehatan Sistem, Resource Runtime & PostgreSQL.
  *
  * Mengukur resource proses Node.js aktual dan latensi query PostgreSQL
  * dengan metode penghitungan terukur tanpa data fiktif / persentase CPU palsu.

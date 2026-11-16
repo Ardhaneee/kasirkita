@@ -39,9 +39,22 @@ export default async function LoginPage({ searchParams }) {
     process.env.NODE_ENV !== "production" ||
     process.env.ENABLE_DEMO_FAST_FILL === "true";
 
+  const demoPasswords = {
+    pemilik:
+      process.env.DEMO_PEMILIK_PASSWORD ||
+      (process.env.NODE_ENV === "production" ? "KasirKita2026!Pemilik" : "pemilik123"),
+    kasir:
+      process.env.DEMO_KASIR_PASSWORD ||
+      (process.env.NODE_ENV === "production" ? "KasirKita2026!Kasir" : "kasir123"),
+  };
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-4 bg-[var(--background)]">
-      <LoginForm callbackUrl={safeCallbackUrl} isDev={isDev} />
+      <LoginForm
+        callbackUrl={safeCallbackUrl}
+        isDev={isDev}
+        demoPasswords={demoPasswords}
+      />
     </main>
   );
 }

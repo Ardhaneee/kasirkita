@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 // TEST SUITE: FASE 7 - MONITORING, ERROR HANDLING & AUDIT KEAMANAN
 // ============================================================================
 
-test("1. Pemeriksaan Kesehatan Database PostgreSQL: Status NORMAL & Latensi Terukur (BNSP Unit 2 & 3)", async () => {
+test("1. Pemeriksaan Kesehatan Database PostgreSQL: Status NORMAL & Latensi Terukur", async () => {
   const { checkDatabaseHealth } = await import("../src/lib/monitoring.js");
 
   const health = await checkDatabaseHealth();
@@ -45,7 +45,7 @@ test("2. Penanganan Kegagalan / Timeout Database Secara Graceful Tanpa Crash & T
   );
 });
 
-test("3. Akurasi Metrik Runtime Node.js: RSS, V8 Heap, CPU, dan Uptime Terukur (BNSP Unit 2)", async () => {
+test("3. Akurasi Metrik Runtime Node.js: RSS, V8 Heap, CPU, dan Uptime Terukur", async () => {
   const { getSystemMetrics, formatUptime } = await import("../src/lib/monitoring.js");
 
   const metrics = getSystemMetrics();
@@ -73,7 +73,7 @@ test("3. Akurasi Metrik Runtime Node.js: RSS, V8 Heap, CPU, dan Uptime Terukur (
   assert.strictEqual(sampleFormatted, "1 jam 1 menit 5 detik");
 });
 
-test("4. Pencatatan Log Sistem Terstruktur ke PostgreSQL system_health_logs (BNSP Unit 3)", async () => {
+test("4. Pencatatan Log Sistem Terstruktur ke PostgreSQL system_health_logs", async () => {
   const { logSystemEvent, getRecentHealthLogs } = await import("../src/lib/logger.js");
 
   const testEvent = "TEST_SYSTEM_LOG_" + Date.now();
@@ -106,7 +106,7 @@ test("4. Pencatatan Log Sistem Terstruktur ke PostgreSQL system_health_logs (BNS
   }
 });
 
-test("5. Anti-Leakage Data Sensitif: Sanitasi Kredensial, Token & DB URL (BNSP Unit 5: Keamanan Informasi)", async () => {
+test("5. Anti-Leakage Data Sensitif: Sanitasi Kredensial, Token & DB URL (Keamanan Informasi)", async () => {
   const { sanitizeLogData, sanitizeLogString } = await import("../src/lib/logger.js");
 
   // Uji sanitasi teks URL database
@@ -144,7 +144,7 @@ test("5. Anti-Leakage Data Sensitif: Sanitasi Kredensial, Token & DB URL (BNSP U
   assert.strictEqual(safeObject.nested.safeField, "Nilai Aman Publik");
 });
 
-test("6. Mekanisme De-duplikasi Alert: Pencegahan Spam Peringatan Berulang (BNSP Unit 7: Alerting)", async () => {
+test("6. Mekanisme De-duplikasi Alert: Pencegahan Spam Peringatan Berulang", async () => {
   const { logSystemEvent, _resetAlertCooldownForTesting } = await import("../src/lib/logger.js");
 
   _resetAlertCooldownForTesting();
@@ -229,7 +229,7 @@ test("7. Manajemen Alert: Pemilik Berhak Menyelesaikan Peringatan (resolveSystem
   }
 });
 
-test("8. Rate Limiter Anti-Brute Force Login: Pembatasan Percobaan Berturut-turut (BNSP Unit 5)", async () => {
+test("8. Rate Limiter Anti-Brute Force Login: Pembatasan Percobaan Berturut-turut", async () => {
   const {
     checkRateLimit,
     recordFailedAttempt,
@@ -278,7 +278,7 @@ test("8. Rate Limiter Anti-Brute Force Login: Pembatasan Percobaan Berturut-turu
   }
 });
 
-test("9. Penyimpanan Snapshot Metrik ke Tabel PostgreSQL system_metrics (BNSP Unit 2)", async () => {
+test("9. Penyimpanan Snapshot Metrik ke Tabel PostgreSQL system_metrics", async () => {
   const { recordMetricSnapshot } = await import("../src/lib/monitoring.js");
 
   const countBefore = await prisma.systemMetric.count();
@@ -375,7 +375,7 @@ test("12. Server-Side RBAC Guard: Rute dan Hak Akses Monitoring Dibatasi Khusus 
   assert.strictEqual(isPemilikAllowedMonitoring, true, "Role PEMILIK diizinkan membuka /monitoring");
 });
 
-test("13. Keamanan Resolusi IP: Menolak Spoofing Header X-Forwarded-For di Lingkungan Lokal (BNSP Unit 5)", async () => {
+test("13. Keamanan Resolusi IP: Menolak Spoofing Header X-Forwarded-For di Lingkungan Lokal", async () => {
   const { resolveClientIp } = await import("../src/lib/rateLimiter.js");
 
   const originalTrustProxy = process.env.TRUST_PROXY;
@@ -419,7 +419,7 @@ test("13. Keamanan Resolusi IP: Menolak Spoofing Header X-Forwarded-For di Lingk
   }
 });
 
-test("14. Konsistensi Peringatan RESOURCE_HIGH_MEMORY: Alert Status HTTP 200 Terjaring di getActiveAlerts (BNSP Unit 7)", async () => {
+test("14. Konsistensi Peringatan RESOURCE_HIGH_MEMORY: Alert Status HTTP 200 Terjaring di getActiveAlerts", async () => {
   const { logSystemEvent, getActiveAlerts, _resetAlertCooldownForTesting } = await import("../src/lib/logger.js");
 
   _resetAlertCooldownForTesting();
@@ -455,7 +455,7 @@ test("14. Konsistensi Peringatan RESOURCE_HIGH_MEMORY: Alert Status HTTP 200 Ter
   }
 });
 
-test("15. Mekanisme Pemulihan Otomatis (Auto-Recovery) & Pelestarian Histori Audit (BNSP Unit 3 & 7)", async () => {
+test("15. Mekanisme Pemulihan Otomatis (Auto-Recovery) & Pelestarian Histori Audit", async () => {
   const {
     logSystemEvent,
     getActiveAlerts,

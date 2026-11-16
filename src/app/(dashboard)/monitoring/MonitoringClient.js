@@ -264,7 +264,7 @@ export default function MonitoringClient({ initialData }) {
         </div>
       </div>
 
-      {/* Catatan Transparansi Metode Pengukuran & Kebijakan Alert (BNSP Unit 2, 7) */}
+      {/* Catatan Transparansi Metode Pengukuran & Kebijakan Alert */}
       <div className="p-3 rounded-lg bg-[var(--surface)] border border-[var(--border)] text-[11px] text-[var(--text-secondary)] flex items-start gap-2">
         <span className="text-sm shrink-0">ℹ️</span>
         <div>

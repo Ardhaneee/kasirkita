@@ -4,7 +4,11 @@ import { useActionState, useEffect, useState } from "react";
 import { loginAction } from "@/actions/authActions";
 import { useRouter } from "next/navigation";
 
-export default function LoginForm({ callbackUrl, isDev }) {
+export default function LoginForm({
+  callbackUrl,
+  isDev,
+  demoPasswords = { pemilik: "pemilik123", kasir: "kasir123" },
+}) {
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -127,19 +131,19 @@ export default function LoginForm({ callbackUrl, isDev }) {
           <div className="grid grid-cols-2 gap-2 text-xs">
             <button
               type="button"
-              onClick={() => setDemoAccount("pemilik", "pemilik123")}
+              onClick={() => setDemoAccount("pemilik", demoPasswords.pemilik)}
               className="px-2.5 py-1.5 rounded border border-[var(--border)] bg-[var(--background)] hover:bg-[#EDEBE5] text-[var(--text-primary)] text-left transition-colors"
             >
               <div className="font-semibold text-[11px]">👤 Pemilik</div>
-              <div className="text-[10px] text-[var(--text-secondary)]">pemilik / pemilik123</div>
+              <div className="text-[10px] text-[var(--text-secondary)] truncate">pemilik / {demoPasswords.pemilik}</div>
             </button>
             <button
               type="button"
-              onClick={() => setDemoAccount("kasir", "kasir123")}
+              onClick={() => setDemoAccount("kasir", demoPasswords.kasir)}
               className="px-2.5 py-1.5 rounded border border-[var(--border)] bg-[var(--background)] hover:bg-[#EDEBE5] text-[var(--text-primary)] text-left transition-colors"
             >
               <div className="font-semibold text-[11px]">⚡ Kasir</div>
-              <div className="text-[10px] text-[var(--text-secondary)]">kasir / kasir123</div>
+              <div className="text-[10px] text-[var(--text-secondary)] truncate">kasir / {demoPasswords.kasir}</div>
             </button>
           </div>
         </div>

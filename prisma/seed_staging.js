@@ -1,5 +1,5 @@
 /**
- * Skrip Seeding Data Sintetis Staging KasirKita (BNSP Unit 1 & 4).
+ * Skrip Seeding Data Sintetis Staging KasirKita.
  *
  * Dirancang khusus untuk deployment staging Vercel + Neon PostgreSQL.
  * Sifat: IDEMPOTEN (Aman dijalankan berulang kali tanpa menghapus atau menduplikasi data).

@@ -714,7 +714,7 @@ export default function StokClient({
       {/* =================================================================== */}
       {isPemilik && activeTab === "rop" && (
         <div className="space-y-4">
-          {/* Card Info Rumus ROP (Tanpa Badge BNSP, Rumus Riil & Fallback Eksplisit) */}
+          {/* Card Info Rumus ROP (Rumus Riil & Fallback Eksplisit) */}
           <div className="p-4 bg-[var(--surface)] border border-[var(--border)] rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="text-xs font-bold text-[var(--text-primary)]">

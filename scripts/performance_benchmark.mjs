@@ -1,5 +1,5 @@
 /**
- * Skrip Analisis Performa & Pengujian Skalabilitas Terukur (BNSP Unit 16).
+ * Skrip Analisis Performa & Pengujian Skalabilitas Terukur.
  *
  * Menguji operasi baca utama KasirKita dengan data riil PostgreSQL
  * pada beban terkendali: konkurensi 1, 5, dan 10 request bersamaan.
@@ -99,7 +99,7 @@ async function runLoadBatch({ url, cookie, totalRequests, concurrency }) {
 
 async function main() {
   console.log("================================================================================");
-  console.log(" KASIRKITA — ANALISIS PERFORMA & PENGUJIAN SKALABILITAS TERUKUR (BNSP UNIT 16)");
+  console.log(" KASIRKITA — ANALISIS PERFORMA & PENGUJIAN SKALABILITAS TERUKUR");
   console.log("================================================================================\n");
 
   const token = await createPemilikToken();
