@@ -89,7 +89,10 @@ export default function ProductClient({
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 2 * 1024 * 1024) {
-        setProductFormError("Ukuran gambar terlalu besar. Maksimal 2 MB.");
+        const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+        setProductFormError(`Ukuran gambar (${sizeMb} MB) melebihi batas. Maksimal 2 MB.`);
+        e.target.value = "";
+        setImagePreview(editingProduct?.gambar_path || null);
         return;
       }
       setProductFormError("");
@@ -106,18 +109,23 @@ export default function ProductClient({
     const formData = new FormData(e.currentTarget);
 
     startTransition(async () => {
-      let result;
-      if (editingProduct) {
-        result = await updateProductAction(editingProduct.id, null, formData);
-      } else {
-        result = await createProductAction(null, formData);
-      }
+      try {
+        let result;
+        if (editingProduct) {
+          result = await updateProductAction(editingProduct.id, null, formData);
+        } else {
+          result = await createProductAction(null, formData);
+        }
 
-      if (result.success) {
-        setIsProductModalOpen(false);
-        showNotification("success", result.message);
-      } else {
-        setProductFormError(result.error || "Gagal menyimpan produk.");
+        if (result && result.success) {
+          setIsProductModalOpen(false);
+          showNotification("success", result.message);
+        } else {
+          setProductFormError(result?.error || "Gagal menyimpan produk.");
+        }
+      } catch (err) {
+        console.error("Gagal mengirim data produk:", err);
+        setProductFormError("Terjadi kendala saat mengirim data. Pastikan berkas gambar tidak melebihi 2 MB.");
       }
     });
   };

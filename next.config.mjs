@@ -8,6 +8,11 @@ const nextConfig = {
       },
     },
   },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "4mb",
+    },
+  },
   images: {
     remotePatterns: [
       {
