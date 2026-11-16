@@ -69,8 +69,8 @@ export async function processAndSaveProductImage(file) {
       .toBuffer();
 
     // 6. Mode Penyimpanan: Vercel Blob di Serverless/Cloud ATAU Local Storage di Dev Offline
-    if (process.env.BLOB_READ_WRITE_TOKEN) {
-      // Unggah ke Vercel Blob Storage
+    if (process.env.VERCEL || process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID) {
+      // Unggah langsung ke Vercel Blob Storage (mendukung OIDC otomatis maupun static token)
       const blob = await put(`products/${safeFileName}`, webpBuffer, {
         access: "public",
         contentType: "image/webp",
@@ -79,14 +79,6 @@ export async function processAndSaveProductImage(file) {
       return {
         success: true,
         imagePath: blob.url,
-      };
-    }
-
-    // Jika berjalan di lingkungan Vercel serverless tapi token belum ada pada deployment aktif:
-    if (process.env.VERCEL) {
-      return {
-        success: false,
-        error: "Blob Store baru saja dibuat tapi belum terbawa ke deployment server. Silakan lakukan Redeploy di Vercel Dashboard agar token aktif.",
       };
     }
 
@@ -132,9 +124,7 @@ export async function deleteProductImage(relativePathOrUrl) {
       relativePathOrUrl.startsWith("http://") ||
       relativePathOrUrl.startsWith("https://")
     ) {
-      if (process.env.BLOB_READ_WRITE_TOKEN) {
-        await del(relativePathOrUrl);
-      }
+      await del(relativePathOrUrl);
       return;
     }
 
