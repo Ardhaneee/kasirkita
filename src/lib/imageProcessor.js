@@ -101,16 +101,9 @@ export async function processAndSaveProductImage(file) {
     };
   } catch (err) {
     console.error("Kesalahan pemrosesan berkas gambar:", err);
-    const msg = String(err?.message || "").toLowerCase();
-    if (msg.includes("private") || msg.includes("access")) {
-      return {
-        success: false,
-        error: "Blob Store di Vercel terkonfigurasi Private. Mohon buat Blob Store dengan tipe Public agar foto dapat diakses langsung oleh katalog.",
-      };
-    }
     return {
       success: false,
-      error: "Gagal memproses gambar. Pastikan berkas gambar valid dan tidak rusak.",
+      error: `Gagal menyimpan gambar: ${err?.message || "Format tidak valid"}. Pastikan Blob Store di Vercel bertipe Public.`,
     };
   }
 }
