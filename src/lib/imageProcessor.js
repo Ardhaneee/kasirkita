@@ -2,6 +2,7 @@ import sharp from "sharp";
 import path from "node:path";
 import fs from "node:fs/promises";
 import crypto from "node:crypto";
+import { put, del } from "@vercel/blob";
 
 const MAX_FILE_SIZE_BYTES = 2 * 1024 * 1024; // 2 MB
 const ALLOWED_FORMATS = new Set(["jpeg", "png", "webp"]);
@@ -9,6 +10,8 @@ const UPLOAD_DIR_RELATIVE = "public/uploads/products";
 
 /**
  * Memproses, mengubah ukuran, mengompresi, dan menyimpan gambar produk.
+ * Mendukung penyimpanan Vercel Blob Storage di cloud dan penyimpanan disk lokal saat development.
+ * 
  * @param {File|Blob|Buffer} file - Berkas gambar yang diunggah
  * @returns {Promise<{ success: boolean, imagePath?: string, error?: string }>}
  */
@@ -28,7 +31,7 @@ export async function processAndSaveProductImage(file) {
     return { success: false, error: "Format berkas tidak dikenali." };
   }
 
-  // 2. Validasi ukuran berkas
+  // 2. Validasi ukuran berkas (Maksimal 2 MB)
   if (buffer.length > MAX_FILE_SIZE_BYTES) {
     return {
       success: false,
@@ -41,7 +44,7 @@ export async function processAndSaveProductImage(file) {
   }
 
   try {
-    // 3. Validasi tipe berkas berdasarkan konten biner via Sharp metadata (Bukan sekadar ekstensi nama)
+    // 3. Validasi tipe berkas berdasarkan metadata biner via Sharp (Anti Ekstensi Palsu)
     const image = sharp(buffer);
     const metadata = await image.metadata();
 
@@ -52,35 +55,52 @@ export async function processAndSaveProductImage(file) {
       };
     }
 
-    // 4. Pastikan direktori tujuan tersedia
-    const uploadDirPath = path.resolve(process.cwd(), UPLOAD_DIR_RELATIVE);
-    await fs.mkdir(uploadDirPath, { recursive: true });
-
-    // 5. Buat nama berkas acak yang aman dan bebas karakter berbahaya (Anti Path Traversal)
+    // 4. Buat nama berkas acak yang aman dan unik
     const uniqueId = crypto.randomBytes(8).toString("hex");
     const safeFileName = `prod_${Date.now()}_${uniqueId}.webp`;
-    const targetFilePath = path.join(uploadDirPath, safeFileName);
 
-    // Verifikasi kembali path tujuan berada di dalam direktori uploads
-    if (!targetFilePath.startsWith(uploadDirPath)) {
-      return { success: false, error: "Upaya path traversal terdeteksi." };
-    }
-
-    // 6. Resize ke 500x500 (rasio 1:1) dan kompresi ke WebP kualitas 80
-    await image
+    // 5. Kompresi dan resize ke 500x500 (rasio 1:1) WebP kualitas 80 dalam memori
+    const webpBuffer = await image
       .resize(500, 500, {
         fit: "cover",
         position: "center",
       })
       .webp({ quality: 80 })
-      .toFile(targetFilePath);
+      .toBuffer();
 
-    // 7. Kembalikan URL publik relatif untuk disimpan ke database
+    // 6. Mode Penyimpanan: Vercel Blob di Serverless/Cloud ATAU Local Storage di Dev Offline
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
+      // Unggah ke Vercel Blob Storage
+      const blob = await put(`products/${safeFileName}`, webpBuffer, {
+        access: "public",
+        contentType: "image/webp",
+      });
+
+      return {
+        success: true,
+        imagePath: blob.url,
+      };
+    }
+
+    // Mode Fallback: Penyimpanan lokal di folder public/uploads/products/ (Development)
+    const uploadDirPath = path.resolve(process.cwd(), UPLOAD_DIR_RELATIVE);
+    await fs.mkdir(uploadDirPath, { recursive: true });
+
+    const targetFilePath = path.join(uploadDirPath, safeFileName);
+
+    // Verifikasi kembali path tujuan berada di dalam direktori uploads (Anti Path Traversal)
+    if (!targetFilePath.startsWith(uploadDirPath)) {
+      return { success: false, error: "Upaya path traversal terdeteksi." };
+    }
+
+    await fs.writeFile(targetFilePath, webpBuffer);
+
     return {
       success: true,
       imagePath: `/uploads/products/${safeFileName}`,
     };
   } catch (err) {
+    console.error("Kesalahan pemrosesan berkas gambar:", err);
     return {
       success: false,
       error: "Gagal memproses gambar. Pastikan berkas gambar valid dan tidak rusak.",
@@ -89,17 +109,31 @@ export async function processAndSaveProductImage(file) {
 }
 
 /**
- * Menghapus berkas gambar produk lama saat diperbarui.
- * @param {string|null} relativePath - Path relatif gambar (misal /uploads/products/prod_123.webp)
+ * Menghapus berkas gambar produk lama saat diperbarui atau dihapus.
+ * Mendukung penghapusan dari Vercel Blob Storage maupun berkas lokal.
+ * 
+ * @param {string|null} relativePathOrUrl - URL Vercel Blob atau path relatif gambar lokal
  */
-export async function deleteProductImage(relativePath) {
-  if (!relativePath || typeof relativePath !== "string") return;
-
-  // Hanya izinkan penghapusan berkas di dalam direktori uploads/products
-  if (!relativePath.startsWith("/uploads/products/")) return;
+export async function deleteProductImage(relativePathOrUrl) {
+  if (!relativePathOrUrl || typeof relativePathOrUrl !== "string") return;
 
   try {
-    const filename = path.basename(relativePath);
+    // 1. Penghapusan Vercel Blob Storage (Cloud)
+    if (
+      relativePathOrUrl.includes("blob.vercel-storage.com") ||
+      relativePathOrUrl.startsWith("http://") ||
+      relativePathOrUrl.startsWith("https://")
+    ) {
+      if (process.env.BLOB_READ_WRITE_TOKEN) {
+        await del(relativePathOrUrl);
+      }
+      return;
+    }
+
+    // 2. Penghapusan Berkas Lokal (Development)
+    if (!relativePathOrUrl.startsWith("/uploads/products/")) return;
+
+    const filename = path.basename(relativePathOrUrl);
     const fullPath = path.resolve(process.cwd(), UPLOAD_DIR_RELATIVE, filename);
     const uploadDirPath = path.resolve(process.cwd(), UPLOAD_DIR_RELATIVE);
 
@@ -107,6 +141,6 @@ export async function deleteProductImage(relativePath) {
       await fs.unlink(fullPath);
     }
   } catch {
-    // Abaikan jika berkas sudah tidak ada
+    // Abaikan jika berkas sudah tidak ada atau terjadi kendala jaringan saat delete lama
   }
 }
